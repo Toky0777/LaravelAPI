@@ -17,7 +17,7 @@ class PostController extends Controller
 
         try {
             $query = Post::query();
-            $perPage = 2;
+            $perPage = 30;
             $page = $request->input('page', 1);
             $search = $request->input('search');
 
@@ -46,7 +46,8 @@ class PostController extends Controller
         try {
             $post = new Post();
             $post->titre = $request->titre;
-            $post->description = $request->descritpion;
+            $post->description = $request->description;
+            $post->user_id = auth()->user()->id;
             $post->save();
 
             return response()->json([
@@ -62,10 +63,17 @@ class PostController extends Controller
     public function update(EditPostRequest $request, Post $post)
     {
         try {
-            $post = new Post();
             $post->titre = $request->titre;
-            $post->description = $request->descritpion;
-            $post->save();
+            $post->description = $request->description;
+
+            if ($post->user_id == auth()->user()->id) {
+                $post->save();
+            } else {
+                return response()->json([
+                    "status_code" => 422,
+                    'status_message' => 'Vous n\'êtes pas l\'auteur de ce post.',
+                ]);
+            }
 
             return response()->json([
                 "status_code" => 200,
@@ -80,20 +88,19 @@ class PostController extends Controller
     public function delete(Post $post)
     {
         try {
-            if ($post) {
+            if ($post->user_id == auth()->user()->id) {
                 $post->delete();
-                return response()->json([
-                    'status_code' => 200,
-                    'status_message' => 'Le post a été supprimé',
-                    'data' => $post
-                ]);
             } else {
-                $post->delete();
                 return response()->json([
-                    'status_code' => 422,
-                    'status_message' => 'Enregistrement introuvable',
+                    "status_code" => 422,
+                    'status_message' => 'Vous n\'êtes pas l\'auteur de ce post. Suppression non autorisé.',
                 ]);
             }
+            return response()->json([
+                'status_code' => 200,
+                'status_message' => 'Le post a été supprimé',
+                'data' => $post
+            ]);
         } catch (Exception $e) {
             return response()->json($e);
         }

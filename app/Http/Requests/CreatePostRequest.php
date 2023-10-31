@@ -28,8 +28,9 @@ class CreatePostRequest extends FormRequest
         ];
     }
 
-    public function failedValidation(Validator $validator){
-        throw new HttpResponseException( response()->json([
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
             'success' => false,
             'error' => true,
             'message' => 'Erreur de validation',
@@ -38,7 +39,8 @@ class CreatePostRequest extends FormRequest
         ]));
     }
 
-    public function messages(){
+    public function messages()
+    {
         return [
             'titre.required' => 'Le titre doit être fourni'
         ];

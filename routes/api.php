@@ -22,15 +22,25 @@ use Illuminate\Support\Facades\Route;
 Route::get('posts', [PostController::class, 'index']);
 
 
-//Ajouter un post | POST PUT PATCH
-Route::post('posts/create', [PostController::class, 'store']);
-Route::put('posts/edit/{id} ', [PostController::class, 'update']);
-Route::delete('posts/{post } ', [PostController::class, 'delete']);
 
 // Inscription
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+
+    //Créer un post
+    Route::post('posts/create', [PostController::class, 'store']);
+
+    //Editer un post
+    Route::put('posts/edit/{post}', [PostController::class, 'update']);
+
+    //Suppression un post
+    Route::delete('posts/{post}', [PostController::class, 'delete']);
+
+    //Retourner l'utilisateur actuellement connecté
+
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
